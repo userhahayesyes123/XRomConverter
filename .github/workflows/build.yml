@@ -2,21 +2,22 @@ name: Build XRomConverter
 on: [push]
 jobs:
   build:
-     runs-on: windows-latest
-     steps:
-       - uses: actions/checkout@v4
-         with:
-           submodules: recursive
-       - name: Setup .NET SDK
-         uses: actions/setup-dotnet@v4
-         with:
-           dotnet-version: '8.0.x'
-       - name: Publish
-         run: |
-           cd $(find . -name "XRomConverter.csproj" -exec dirname {} ;)
-           dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
-       - name: Upload Artifact
-         uses: actions/upload-artifact@v4
-         with:
-           name: XRomConverter-Win64
-           path: '**/bin/Release/net*-windows/win-x64/publish/'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish
+        run: |
+          $proj = Get-ChildItem -Recurse -Filter "XRomConverter.csproj" | Select-Object -First 1
+          Set-Location $proj.DirectoryName
+          dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: XRomConverter-Win64
+          path: '**/bin/Release/net*-windows/win-x64/publish/'
