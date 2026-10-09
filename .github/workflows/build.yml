@@ -13,11 +13,14 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Publish
+        with:
+          arch: x64
+      - name: Build Solution
+        shell: cmd
         run: |
-          $proj = Get-ChildItem -Recurse -Filter "XRomConverter.csproj" | Select-Object -First 1
-          Set-Location $proj.DirectoryName
-          dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+          for /r %%i in (*.sln) do (
+            msbuild "%%i" /p:Configuration=Release /p:Platform=x64
+          )
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
