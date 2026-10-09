@@ -1,22 +1,32 @@
-name: Build XRomConverter
+name: Build XRomConverter Fixed
 on: [workflow_dispatch]
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Checkout Code
+    - name: Checkout Standalone Code
       uses: actions/checkout@v4
       with:
-        submodules: recursive
+        submodules: 'false'
 
-    - name: Add MSBuild to Path
-      uses: microsoft/setup-msbuild@v2
+    - name: Force Download Dependency Directly
+      run: |
+        rmdir /s /q Dependencies\MikuMikuLibrary
+        git clone https://github.com Dependencies/MikuMikuLibrary
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
+
+    - name: Restore NuGet Packages
+      run: |
+        dotnet restore XRomConverter/XRomConverter.csproj
+        dotnet restore Dependencies/MikuMikuLibrary/MikuMikuLibrary/MikuMikuLibrary.csproj
+
+    - name: Add MSBuild to Path
+      uses: microsoft/setup-msbuild@v2
 
     - name: Build Solution
       run: msbuild XRomConverter.sln /p:Configuration=Release /p:Platform="Any CPU"
