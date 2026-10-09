@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore XRomConverter.sln
 
     - name: Build Solution
-      run: msbuild XRomConverter.sln /p:Configuration=Release /p:Platform="Any CPU"
+  run: dotnet build XRomConverter.sln --configuration Release --no-restore
 
     - name: Upload Compiled Executable
       uses: actions/upload-artifact@v4
