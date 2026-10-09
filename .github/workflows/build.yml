@@ -1,32 +1,20 @@
 name: Build XRomConverter
-on: [workflow_dispatch]
-
+on: [push]
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-
-    - name: Add MSBuild to Path
-      uses: microsoft/setup-msbuild@v2
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Restore NuGet Packages
-      run: dotnet restore XRomConverter.sln
-
-    - name: Build Solution
-  run: dotnet build XRomConverter.sln --configuration Release --no-restore
-
-    - name: Upload Compiled Executable
-      uses: actions/upload-artifact@v4
-      with:
-        name: XRomConverter-Windows
-        path: |
-          **/bin/Release/**
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish
+        run: dotnet publish XRomConverter.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: XRomConverter-Win64
+          path: bin/Release/net8.0-windows/win-x64/publish/
