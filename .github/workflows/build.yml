@@ -20,9 +20,14 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Compile Main Application Only
+    - name: Manually Generate Assets Map
       run: |
-        dotnet publish XRomConverter/XRomConverter.csproj -c Release -r win-x64 --self-contained true -o ./publish-output
+        dotnet restore XRomConverter/XRomConverter.csproj --disable-parallel
+        dotnet restore Dependencies/MikuMikuLibrary/MikuMikuLibrary/MikuMikuLibrary.csproj --disable-parallel
+
+    - name: Compile Main Application Isolated
+      run: |
+        dotnet publish XRomConverter/XRomConverter.csproj -c Release -r win-x64 --self-contained true --no-restore -o ./publish-output
 
     - name: Upload Compiled Executable
       uses: actions/upload-artifact@v4
