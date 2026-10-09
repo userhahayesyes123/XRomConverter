@@ -11,8 +11,8 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Publish
         run: |
           $proj = Get-ChildItem -Recurse -Filter "XRomConverter.csproj" | Select-Object -First 1
