@@ -1,36 +1,32 @@
-name: Build XRomConverter Fixed
+name: Build XRomConverter
 on: [workflow_dispatch]
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Checkout Standalone Code
+    - name: Checkout Code
       uses: actions/checkout@v4
       with:
-        submodules: 'false'
+        submodules: recursive
 
-    - name: Force Download Dependency Directly
-      run: |
-        rmdir /s /q Dependencies\MikuMikuLibrary
-        git clone https://github.com Dependencies/MikuMikuLibrary
+    - name: Add MSBuild to Path
+      uses: microsoft/setup-msbuild@v2
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
-    - name: Manually Generate Assets Map
-      run: |
-        dotnet restore XRomConverter/XRomConverter.csproj --disable-parallel
-        dotnet restore Dependencies/MikuMikuLibrary/MikuMikuLibrary/MikuMikuLibrary.csproj --disable-parallel
+    - name: Restore NuGet Packages
+      run: dotnet restore XRomConverter.sln
 
-    - name: Compile Main Application Isolated
-      run: |
-        dotnet publish XRomConverter/XRomConverter.csproj -c Release -r win-x64 --self-contained true --no-restore -o ./publish-output
+    - name: Build Solution
+      run: msbuild XRomConverter.sln /p:Configuration=Release /p:Platform="Any CPU"
 
     - name: Upload Compiled Executable
       uses: actions/upload-artifact@v4
       with:
         name: XRomConverter-Windows
-        path: ./publish-output/
+        path: |
+          **/bin/Release/**
